@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration_Search" host="0.0.0.0" port="8088" doc:name="HTTP Listener Configuration"/>
+    <http:request-config name="WS-InsashipServer-Config_Search" host="localhost" port="8080" doc:name="HTTP Request Configuration" protocol="HTTP"/>
+    <flow name="companies-search-offers-flow">
+        <http:listener config-ref="HTTP_Listener_Configuration_Search" path="/searchoffers" doc:name="Input query" allowedMethods="GET"/>
+        <http:request config-ref="WS-InsashipServer-Config_Search" path="enterprise1jobsofferws-0.0.1-SNAPSHOT/api/v1/search/offers" method="GET" doc:name="WS1 REST Call">
+            <http:request-builder>
+                <http:query-param paramName="keyword" value="#[message.inboundProperties.'http.query.params'.keyword]"/>
+            </http:request-builder>
+        </http:request>
+    </flow>
+</mule>
