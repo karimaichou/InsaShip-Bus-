@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry exported="true" kind="con" path="MULE_RUNTIME/org.mule.tooling.server.3.8.0"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry exported="true" kind="lib" path="/Applications/AnypointStudio.app/Contents/Eclipse/plugins/org.mule.tooling.server.3.8.0_6.0.0.201605131329/mule/lib/mule/mule-core-3.8.0.jar" sourcepath="/Applications/AnypointStudio.app/Contents/Eclipse/plugins/org.mule.tooling.server.3.8.0_6.0.0.201605131329/mule/src/mule-sources-3.8.0.zip"/>
 	<classpathentry kind="src" path="src/main/app"/>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
@@ -10,5 +10,7 @@
 	<classpathentry kind="src" path="src/main/api"/>
 	<classpathentry kind="src" path="src/main/wsdl"/>
 	<classpathentry kind="src" path="src/test/munit"/>
+	<classpathentry kind="src" path="mappings"/>
+	<classpathentry exported="true" kind="con" path="MULE_RUNTIME/org.mule.tooling.server.3.8.0"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

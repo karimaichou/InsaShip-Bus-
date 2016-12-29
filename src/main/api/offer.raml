@@ -1,0 +1,56 @@
+#%RAML 0.8
+title: internship_offer_api
+version: 1.0
+baseUri: http://localhost:8081/api/{version}
+/search:
+  displayName: InsaShip search for offers
+  get:
+    description: Query companies internship offers
+    queryParameters:
+      keyword:
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "Offer" :  {
+                  "ident" : "cpnyId-offerId",
+                  "title" : "offer title",
+                  "description" : "offer description"
+                  }
+              }
+            schema: |
+              {
+                "$schema": "http://json-schema.org/draft-04/schema#",
+                "id": "http://jsonschema.net",
+                "type": "object",
+                "properties": {
+                  "Offer": {
+                    "id": "http://jsonschema.net/Offer",
+                    "type": "object",
+                    "properties": {
+                      "ident": {
+                        "id": "http://jsonschema.net/Offer/ident",
+                        "type": "string"
+                      },
+                      "title": {
+                        "id": "http://jsonschema.net/Offer/title",
+                        "type": "string"
+                      },
+                      "description": {
+                        "id": "http://jsonschema.net/Offer/description",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "ident",
+                      "title",
+                      "description"
+                    ]
+                  }
+                },
+                "required": [
+                  "Offer"
+                ]
+              }
