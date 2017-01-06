@@ -3,6 +3,12 @@ package fr.insaship.collection;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Class used to combine company information and offers retrieved from Company WS.
+ * 
+ * @author Franck-Gravouil
+ *
+ */
 public class  CompanyOffers implements Serializable {
 
 	/**

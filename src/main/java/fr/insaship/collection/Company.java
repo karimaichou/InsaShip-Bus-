@@ -1,7 +1,12 @@
 package fr.insaship.collection;
 
 import java.io.Serializable;
-
+/**
+ * Company object.
+ * 
+ * @author Franck-Gravouil
+ *
+ */
 public class Company implements Serializable {
 
 	/**

@@ -3,6 +3,12 @@ package fr.insaship.collection;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class used to map object to Company Two REST WS
+ * 
+ * @author Franck-Gravouil
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompanyTwoOfferMapping extends Offer {
 

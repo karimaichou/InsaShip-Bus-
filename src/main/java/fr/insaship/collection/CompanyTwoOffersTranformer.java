@@ -7,9 +7,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 
-public class CompanyTwoOffersTranformer extends AbstractMessageTransformer{
+/**
+ * Construction of an object combining the company Two infos and its offers. 
+ * 
+ * @author Franck-Gravouil
+ *
+ */
+public class CompanyTwoOffersTranformer extends AbstractMessageTransformer {
  
-
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		

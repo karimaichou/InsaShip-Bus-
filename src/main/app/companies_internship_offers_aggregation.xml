@@ -6,10 +6,16 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     <http:listener-config name="offer-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
-    <apikit:config name="offer-config" raml="offer.raml" consoleEnabled="false" doc:name="Router"/>
+    <apikit:config name="offer-config" raml="offer.raml" consoleEnabled="false" doc:name="Router">
+        <apikit:flow-mapping resource="/search" action="get" flow-ref="get:/search:offer-config"/>
+        <apikit:flow-mapping resource="/alloffers" action="get" flow-ref="get:/alloffers:offer-config"/>
+    </apikit:config>
+    <!-- Configuration used to query company one WS -->
     <http:request-config name="HTTP_Request_Company1_Config" protocol="HTTP" host="localhost" port="8080" basePath="/enterprise1jobsofferws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration"/>
+    <!-- Configuration used to query company two WS -->
     <http:request-config name="HTTP_Request_Company2_Config" protocol="HTTP" host="localhost" port="8080" basePath="/enterprise2joboffersws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration"/>
      
+    <!-- Custom JsonMapper - specific configuration -->
     <spring:beans>
         <spring:bean id="MyJsonMApper" name="NonNullMapper" class="fr.insaship.util.MyJsonMapper"/>
 	</spring:beans>
@@ -19,10 +25,20 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         <apikit:router config-ref="offer-config" doc:name="APIkit Router"/>
         <exception-strategy ref="offer-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
     </flow>
+    
+    <!-- API Test Console -->
     <!--<flow name="offer-console">
         <http:listener config-ref="offer-httpListenerConfig" path="/console/*" doc:name="HTTP"/>
         <apikit:console config-ref="offer-config" doc:name="APIkit Console"/>
     </flow>-->
+    
+    <!-- Retrieve all offers from all companies -->
+    <flow name="get:/alloffers:offer-config">
+        <!-- Call search offers without keyword = get all offers -->
+    	<flow-ref name="get:/search:offer-config" doc:name="get:/search:offer-config"/>
+    </flow>
+    
+    <!-- Search for offers in all companies -->
     <flow name="get:/search:offer-config">
         <scatter-gather doc:name="Scatter-Gather">
             <processor-chain>
@@ -77,6 +93,8 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         <json:object-to-json-transformer doc:name="Object to JSON" mimeType="application/json" mapper-ref="NonNullMapper" ignoreBadInput="true"/>
         <logger level="INFO" doc:name="Logger"/>
     </flow>
+    
+    <!--  API Global exceptions handling -->
     <apikit:mapping-exception-strategy name="offer-apiKitGlobalExceptionMapping">
         <apikit:mapping statusCode="404">
             <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />

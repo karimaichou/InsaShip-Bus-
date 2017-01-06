@@ -2,12 +2,56 @@
 title: internship_offer_api
 version: 1.0
 baseUri: http://localhost:8081/api/{version}
+/alloffers:
+  displayName: InsaShip get all offers from all companies
+  get:
+    description: Query all companies all internship offers
+    responses:
+      200:
+        body:
+         application/json:
+          schema: |
+              {
+                "$schema": "http://json-schema.org/draft-04/schema#",
+                "id": "http://jsonschema.net",
+                "type": "object",
+                "properties": {
+                  "Offer": {
+                    "id": "http://jsonschema.net/Offer",
+                    "type": "object",
+                    "properties": {
+                      "ident": {
+                        "id": "http://jsonschema.net/Offer/ident",
+                        "type": "string"
+                      },
+                      "title": {
+                        "id": "http://jsonschema.net/Offer/title",
+                        "type": "string"
+                      },
+                      "description": {
+                        "id": "http://jsonschema.net/Offer/description",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "ident",
+                      "title",
+                      "description"
+                    ]
+                  }
+                },
+                "required": [
+                  "Offer"
+                ]
+              }
 /search:
   displayName: InsaShip search for offers
   get:
     description: Query companies internship offers
     queryParameters:
       keyword:
+        type: string
+        required: true
     responses:
       200:
         body:
