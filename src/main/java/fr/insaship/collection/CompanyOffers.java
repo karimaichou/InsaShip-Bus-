@@ -24,7 +24,7 @@ public class  CompanyOffers implements Serializable {
 		this.company = company;
 		this.offerList = offerList;
 	}
-
+	
 	public Company getCompany() {
 		return company;
 	}

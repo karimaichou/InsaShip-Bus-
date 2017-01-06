@@ -1,125 +1,227 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
-    <http:listener-config name="offer-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
-    <apikit:config name="offer-config" raml="offer.raml" consoleEnabled="false" doc:name="Router">
-        <apikit:flow-mapping resource="/search" action="get" flow-ref="get:/search:offer-config"/>
-        <apikit:flow-mapping resource="/alloffers" action="get" flow-ref="get:/alloffers:offer-config"/>
-    </apikit:config>
-    <!-- Configuration used to query company one WS -->
-    <http:request-config name="HTTP_Request_Company1_Config" protocol="HTTP" host="localhost" port="8080" basePath="/enterprise1jobsofferws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration"/>
-    <!-- Configuration used to query company two WS -->
-    <http:request-config name="HTTP_Request_Company2_Config" protocol="HTTP" host="localhost" port="8080" basePath="/enterprise2joboffersws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration"/>
-     
-    <!-- Custom JsonMapper - specific configuration -->
-    <spring:beans>
-        <spring:bean id="MyJsonMApper" name="NonNullMapper" class="fr.insaship.util.MyJsonMapper"/>
+	<http:listener-config name="offer-httpListenerConfig"
+		host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration" />
+	<apikit:config name="offer-config" raml="offer.raml"
+		consoleEnabled="false" doc:name="Router">
+		<apikit:flow-mapping resource="/search" action="get"
+			flow-ref="get:/search:offer-config" />
+		<apikit:flow-mapping resource="/alloffers" action="get"
+			flow-ref="get:/alloffers:offer-config" />
+		<apikit:flow-mapping resource="/singleoffer"
+			action="get" flow-ref="get:/singleoffer:offer-config" />
+	</apikit:config>
+	<!-- Configuration used to query company one WS -->
+	<http:request-config name="HTTP_Request_Company1_Config"
+		protocol="HTTP" host="localhost" port="8080"
+		basePath="/enterprise1jobsofferws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration" />
+	<!-- Configuration used to query company two WS -->
+	<http:request-config name="HTTP_Request_Company2_Config"
+		protocol="HTTP" host="localhost" port="8080"
+		basePath="/enterprise2joboffersws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration" />
+
+	<!-- Custom JsonMapper - specific configuration -->
+	<spring:beans>
+		<spring:bean id="MyJsonMApper" name="NonNullMapper"
+			class="fr.insaship.util.MyJsonMapper" />
 	</spring:beans>
-	
-    <flow name="offer-main">
-        <http:listener config-ref="offer-httpListenerConfig" path="/api/*" doc:name="HTTP"/>
-        <apikit:router config-ref="offer-config" doc:name="APIkit Router"/>
-        <exception-strategy ref="offer-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
-    </flow>
-    
-    <!-- API Test Console -->
-    <!--<flow name="offer-console">
-        <http:listener config-ref="offer-httpListenerConfig" path="/console/*" doc:name="HTTP"/>
-        <apikit:console config-ref="offer-config" doc:name="APIkit Console"/>
-    </flow>-->
-    
-    <!-- Retrieve all offers from all companies -->
-    <flow name="get:/alloffers:offer-config">
-        <!-- Call search offers without keyword = get all offers -->
-    	<flow-ref name="get:/search:offer-config" doc:name="get:/search:offer-config"/>
-    </flow>
-    
-    <!-- Search for offers in all companies -->
-    <flow name="get:/search:offer-config">
-        <scatter-gather doc:name="Scatter-Gather">
-            <processor-chain>
-                
-                <http:request config-ref="HTTP_Request_Company1_Config" path="/search/offers" method="GET" doc:name="Company 1 REST API">
-                    <http:request-builder>
-                        <http:query-param paramName="keyword" value="#[message.inboundProperties.'http.query.params'.keyword]"/>
-                    </http:request-builder>
-                   <http:success-status-code-validator values="200,404"/>
-            
-                </http:request>
-                
-                <choice doc:name="Choice">
-                	<when expression="#[message.inboundProperties['http.status'] == '404']">
-                	     <set-payload value="#[null]" doc:name="Set Payload"/>  
-                        <!--<object-to-string-transformer doc:name="Object to String"/>
-                        <logger level="INFO" doc:name="Logger"/>-->
-                		
-                	</when>
-                    <otherwise>
-                        <json:json-to-object-transformer returnClass="fr.insaship.collection.CompanyOneOfferMapping[]" mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object"/>
-                        <custom-transformer returnClass="fr.insaship.collection.CompanyOffers" class="fr.insaship.collection.CompanyOneOffersTranformer" doc:name="Java CompanyOffers transformation"/>
-                        <logger level="INFO" doc:name="Logger"/>
-			         </otherwise>
-			      </choice>
-            </processor-chain>
-            <processor-chain>
-            
-                <http:request config-ref="HTTP_Request_Company2_Config" path="/recherche/offre" method="GET" doc:name="Company 2 REST API">
-                    <http:request-builder>
-                        <http:query-param paramName="key" value="#[message.inboundProperties.'http.query.params'.keyword]"/>
-                    </http:request-builder>
-                    	<!-- Do not throw exception on 404 (no results from api) to continue flow and map with null payload -->
-                        <http:success-status-code-validator values="200,404"/>
-            
-                </http:request>
-                <choice doc:name="Choice">
-                	<when expression="#[message.inboundProperties['http.status'] == '404']">
-                	     <set-payload value="#[null]" doc:name="Set Payload to null"/>  
-                        <!-- <object-to-string-transformer doc:name="Object to String"/>
-                        <logger level="INFO" doc:name="Logger"/>-->
-              
-                	</when>
-                    <otherwise>
-                        <json:json-to-object-transformer returnClass="fr.insaship.collection.CompanyTwoOfferMapping[]" mimeType="application/json" doc:name="JSON Results to CompanyOfferMapping Object"/>
-                        <custom-transformer returnClass="fr.insaship.collection.CompanyOffers" class="fr.insaship.collection.CompanyTwoOffersTranformer" doc:name="Java CompanyOffers transformation"/>
-                        <logger level="INFO" doc:name="Logger"/>
-                    </otherwise>
-                </choice>
-            </processor-chain>
-        </scatter-gather>
-        <json:object-to-json-transformer doc:name="Object to JSON" mimeType="application/json" mapper-ref="NonNullMapper" ignoreBadInput="true"/>
-        <logger level="INFO" doc:name="Logger"/>
-    </flow>
-    
-    <!--  API Global exceptions handling -->
-    <apikit:mapping-exception-strategy name="offer-apiKitGlobalExceptionMapping">
-        <apikit:mapping statusCode="404">
-            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="405">
-            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="415">
-            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="406">
-            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-        <apikit:mapping statusCode="400">
-            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
-            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
-            <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload"/>
-        </apikit:mapping>
-    </apikit:mapping-exception-strategy>
+
+
+
+	<flow name="offer-main">
+		<http:listener config-ref="offer-httpListenerConfig"
+			path="/api/*" doc:name="HTTP" />
+		<apikit:router config-ref="offer-config" doc:name="APIkit Router" />
+		<exception-strategy ref="offer-apiKitGlobalExceptionMapping"
+			doc:name="Reference Exception Strategy" />
+	</flow>
+
+	<!-- API Test Console -->
+	<!--<flow name="offer-console"> <http:listener config-ref="offer-httpListenerConfig" 
+		path="/console/*" doc:name="HTTP"/> <apikit:console config-ref="offer-config" 
+		doc:name="APIkit Console"/> </flow> -->
+
+	<!-- Retrieve all offers from all companies -->
+	<flow name="get:/alloffers:offer-config">
+		<!-- Call search offers without keyword = get all offers -->
+		<flow-ref name="get:/search:offer-config" doc:name="get:/search:offer-config" />
+	</flow>
+
+	<!-- Search for offers in all companies -->
+	<flow name="get:/search:offer-config">
+		<scatter-gather doc:name="Scatter-Gather">
+			<processor-chain>
+
+				<http:request config-ref="HTTP_Request_Company1_Config"
+					path="/search/offers" method="GET" doc:name="Company 1 REST API - search offers">
+					<http:request-builder>
+						<http:query-param paramName="keyword"
+							value="#[message.inboundProperties.'http.query.params'.keyword]" />
+					</http:request-builder>
+					<http:success-status-code-validator
+						values="200,404" />
+
+				</http:request>
+				<choice doc:name="Choice">
+					<when expression="#[message.inboundProperties['http.status'] == '404']">
+						<set-payload value="#[null]" doc:name="Set Payload" />
+					</when>
+					<otherwise>
+						<json:json-to-object-transformer
+							returnClass="fr.insaship.collection.CompanyOneOfferMapping[]"
+							mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object" />
+						<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
+							class="fr.insaship.collection.CompanyOneOffersTranformer"
+							doc:name="Java CompanyOffers transformation" />
+						<logger level="INFO" doc:name="Logger" />
+					</otherwise>
+				</choice>
+			</processor-chain>
+			<processor-chain>
+
+				<http:request config-ref="HTTP_Request_Company2_Config"
+					path="/recherche/offre" method="GET" doc:name="Company 2 REST API - search offers">
+					<http:request-builder>
+						<http:query-param paramName="key"
+							value="#[message.inboundProperties.'http.query.params'.keyword]" />
+					</http:request-builder>
+					<!-- Do not throw exception on 404 (no results from api) to continue 
+						flow and map with null payload -->
+					<http:success-status-code-validator
+						values="200,404" />
+
+				</http:request>
+				<choice doc:name="Choice">
+					<when expression="#[message.inboundProperties['http.status'] == '404']">
+						<set-payload value="#[null]" doc:name="Set Payload to null" />
+					</when>
+					<otherwise>
+						<json:json-to-object-transformer
+							returnClass="fr.insaship.collection.CompanyTwoOfferMapping[]"
+							mimeType="application/json" doc:name="JSON Results to CompanyOfferMapping Object" />
+						<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
+							class="fr.insaship.collection.CompanyTwoOffersTranformer"
+							doc:name="Java CompanyOffers transformation" />
+						<logger level="INFO" doc:name="Logger" />
+					</otherwise>
+				</choice>
+			</processor-chain>
+		</scatter-gather>
+		<json:object-to-json-transformer
+			doc:name="Object to JSON" mimeType="application/json" mapper-ref="NonNullMapper"
+			ignoreBadInput="true" />
+		<logger level="INFO" doc:name="Logger" />
+	</flow>
+
+	<!-- Retrieve an offer from a given company id and an offer id -->
+	<flow name="get:/singleoffer:offer-config">
+		<choice doc:name="Choice">
+			<!-- if company One -->
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '1']">
+
+				<http:request config-ref="HTTP_Request_Company1_Config"
+					path="/offer" method="GET" doc:name="Company 1 REST API - get one offer">
+					<http:request-builder>
+						<http:query-param paramName="id"
+							value="#[message.inboundProperties.'http.query.params'.offerId]" />
+					</http:request-builder>
+					<http:success-status-code-validator
+						values="200" />
+				</http:request>
+
+				<json:json-to-object-transformer
+					returnClass="fr.insaship.collection.CompanyOneOfferMapping"
+					mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object" />
+				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
+					class="fr.insaship.collection.CompanyOneSingleOfferTranformer"
+					doc:name="Java CompanyOffer transformation" />
+
+			</when>
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '2']">
+				<http:request config-ref="HTTP_Request_Company2_Config"
+					path="/offre" method="GET" doc:name="Company 2 REST API - get one offer">
+					<http:request-builder>
+						<http:query-param paramName="id"
+							value="#[message.inboundProperties.'http.query.params'.offerId]" />
+					</http:request-builder>
+					<http:success-status-code-validator
+						values="200" />
+				</http:request>
+				<json:json-to-object-transformer
+					returnClass="fr.insaship.collection.CompanyTwoOfferMapping"
+					mimeType="application/json" doc:name="JSON Results to CompanyTwoOfferMapping Object" />
+				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
+					class="fr.insaship.collection.CompanyTwoSingleOfferTranformer"
+					doc:name="Java CompanyOffer transformation" />
+				
+			</when>
+			<otherwise>
+				<set-payload value="#[null]" doc:name="Set Payload to null" />
+				<logger level="INFO" doc:name="Logger" />
+			</otherwise>
+		</choice>
+		<json:object-to-json-transformer
+			doc:name="Object to JSON" mimeType="application/json" mapper-ref="NonNullMapper"
+			ignoreBadInput="true" />
+		<logger level="INFO" doc:name="Logger" />
+	</flow>
+
+
+	<!-- API Global exceptions handling -->
+	<apikit:mapping-exception-strategy
+		name="offer-apiKitGlobalExceptionMapping">
+		<apikit:mapping statusCode="404">
+			<apikit:exception
+				value="org.mule.module.apikit.exception.NotFoundException" />
+			<set-property propertyName="Content-Type" value="application/json"
+				doc:name="Property" />
+			<set-payload
+				value="{ &quot;message&quot;: &quot;Resource not found&quot; }"
+				doc:name="Set Payload" />
+		</apikit:mapping>
+		<apikit:mapping statusCode="405">
+			<apikit:exception
+				value="org.mule.module.apikit.exception.MethodNotAllowedException" />
+			<set-property propertyName="Content-Type" value="application/json"
+				doc:name="Property" />
+			<set-payload
+				value="{ &quot;message&quot;: &quot;Method not allowed&quot; }"
+				doc:name="Set Payload" />
+		</apikit:mapping>
+		<apikit:mapping statusCode="415">
+			<apikit:exception
+				value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
+			<set-property propertyName="Content-Type" value="application/json"
+				doc:name="Property" />
+			<set-payload
+				value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }"
+				doc:name="Set Payload" />
+		</apikit:mapping>
+		<apikit:mapping statusCode="406">
+			<apikit:exception
+				value="org.mule.module.apikit.exception.NotAcceptableException" />
+			<set-property propertyName="Content-Type" value="application/json"
+				doc:name="Property" />
+			<set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }"
+				doc:name="Set Payload" />
+		</apikit:mapping>
+		<apikit:mapping statusCode="400">
+			<apikit:exception
+				value="org.mule.module.apikit.exception.BadRequestException" />
+			<set-property propertyName="Content-Type" value="application/json"
+				doc:name="Property" />
+			<set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }"
+				doc:name="Set Payload" />
+		</apikit:mapping>
+	</apikit:mapping-exception-strategy>
 </mule>

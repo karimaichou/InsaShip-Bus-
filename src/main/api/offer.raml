@@ -98,3 +98,18 @@ baseUri: http://localhost:8081/api/{version}
                   "Offer"
                 ]
               }
+/singleoffer:
+  displayName: InsaShip search for offers
+  get:
+    description: Get a single internship offer for a given companyId and an offerId
+    queryParameters:
+      cpnId:
+        type: string
+        required: true
+      offerId:
+        type: string
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
