@@ -19,7 +19,12 @@ public class CompanyOneOffersTranformer extends AbstractMessageTransformer {
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		
 		Offer[] offers =  (Offer[]) message.getPayload();
-		Company companyOne = new Company(1, "Company One", "http://Company One logoUrl");
+	
+		String companyID = muleContext.getRegistry().get("company1.id");
+		String companyName = muleContext.getRegistry().get("company1.name");
+		String companyLogoUrl = muleContext.getRegistry().get("company1.logourl");
+		
+		Company companyOne = new Company(Integer.parseInt(companyID), companyName, companyLogoUrl);
 		
 		CompanyOffers result = new CompanyOffers(companyOne, Arrays.asList(offers));
 		

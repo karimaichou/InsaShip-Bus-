@@ -23,12 +23,12 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	</apikit:config>
 	<!-- Configuration used to query company one WS -->
 	<http:request-config name="HTTP_Request_Company1_Config"
-		protocol="HTTP" host="localhost" port="8080"
-		basePath="/enterprise1jobsofferws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration" />
+		protocol="${company1.webservice.protocol}" host="${company1.webservice.host}" port="${company1.webservice.port}"
+		basePath="${company1.webservice.baseurl}" doc:name="HTTP Request Configuration" />
 	<!-- Configuration used to query company two WS -->
 	<http:request-config name="HTTP_Request_Company2_Config"
-		protocol="HTTP" host="localhost" port="8080"
-		basePath="/enterprise2joboffersws-0.0.1-SNAPSHOT/api/v1" doc:name="HTTP Request Configuration" />
+		protocol="HTTP" host="${company2.webservice.host}" port="${company2.webservice.port}"
+		basePath="${company2.webservice.baseurl}" doc:name="HTTP Request Configuration" />
 
 	<!-- Custom JsonMapper - specific configuration -->
 	<spring:beans>

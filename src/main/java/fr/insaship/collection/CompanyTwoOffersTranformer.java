@@ -19,9 +19,14 @@ public class CompanyTwoOffersTranformer extends AbstractMessageTransformer {
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		
 		Offer[] offers =  (Offer[]) message.getPayload();
-		Company companyOne = new Company(2, "Company Two", "http://Company Two logoUrl");
+	
+		String companyID = muleContext.getRegistry().get("company2.id");
+		String companyName = muleContext.getRegistry().get("company2.name");
+		String companyLogoUrl = muleContext.getRegistry().get("company2.logourl");
+	
+		Company companyTwo= new Company(Integer.parseInt(companyID), companyName, companyLogoUrl);
 		
-		CompanyOffers result = new CompanyOffers(companyOne, Arrays.asList(offers));
+		CompanyOffers result = new CompanyOffers(companyTwo, Arrays.asList(offers));
 		
 		return result;
 	}
