@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp" xmlns:twilio="http://www.mulesoft.org/schema/mule/twilio" xmlns:imap="http://www.mulesoft.org/schema/mule/imap" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp" xmlns:twilio="http://www.mulesoft.org/schema/mule/twilio" xmlns:imap="http://www.mulesoft.org/schema/mule/imap" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd
-http://www.mulesoft.org/schema/mule/twilio http://www.mulesoft.org/schema/mule/twilio/current/mule-twilio.xsd
-http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
-http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
-    <smtp:gmail-connector name="Gmail" validateConnections="true" doc:name="Gmail"/>
+	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+	http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd
+	http://www.mulesoft.org/schema/mule/twilio http://www.mulesoft.org/schema/mule/twilio/current/mule-twilio.xsd
+	http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
+	http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+	http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+	<smtp:gmail-connector name="Gmail" validateConnections="true" doc:name="Gmail" contentType="text/html"/>
     <flow name="get:/messages:offer-config">
-        <parse-template location="src/main/resources/InsaShip-welcome.html" doc:name="Parse Template"/>
-        <smtp:outbound-endpoint host="smtp.gmail.com" port="587" connector-ref="Gmail" responseTimeout="10000" doc:name="SMTP" password="${gmail.password}" user="${gmail.user}" from="${gmail.user}" subject="Test" to="#[message.inboundProperties.'http.query.params'.email]" mimeType="text/html; charset=UTF-8"/>
+        <choice doc:name="Template selection">
+        	<when expression="#[message.inboundProperties.'http.query.params'.type == '1']">
+				<parse-template location="src/main/resources/mails-templates/mail-template1.html" doc:name="Parse Mail Template 1"/>
+			</when>
+			<when expression="#[message.inboundProperties.'http.query.params'.type == '2']">
+				<parse-template location="src/main/resources/mails-templates/mail-template2.html" doc:name="Parse Mail Template 2"/>
+			</when>
+			<when expression="#[message.inboundProperties.'http.query.params'.type == '3']">
+				<parse-template location="src/main/resources/mails-templates/mail-template3.html" doc:name="Parse Mail Template 3"/>
+			</when>
+            <otherwise>
+                <parse-template location="src/main/resources/mails-templates/InsaShip-welcome.html" doc:name="Parse Mail Template XXX"/>
+            </otherwise>
+        </choice>
+    	<!--<set-payload value="#[message.payloadAs(java.lang.String)]" doc:name="Set Payload"/> -->
+        <smtp:outbound-endpoint host="smtp.gmail.com" port="587" connector-ref="Gmail" responseTimeout="10000" doc:name="SMTP" password="${gmail.password}" user="${gmail.user}" from="${gmail.user}" subject="Test" to="#[message.inboundProperties.'http.query.params'.email]" mimeType="text/html"  encoding="UTF-8" >        
+        </smtp:outbound-endpoint>
     </flow>
 </mule>
