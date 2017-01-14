@@ -1,36 +1,38 @@
-package fr.insaship.collection;
+package fr.insaship.collection.company1;
+
+import java.io.Serializable;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
- * Class used to map object to Company Two REST WS
+ * Class used to map object to Company One REST WS
  * 
  * @author Franck-Gravouil
  *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CompanyTwoOfferMapping extends Offer {
+public class CompanyOneOfferMapping implements Serializable {
 
 	private static final long serialVersionUID = 2454496012325907877L;
 	@JsonProperty(value="id")
 	private int id;
 	
-	@JsonProperty(value="titre")
+	@JsonProperty(value="title")
 	private String title;
 	
-	@JsonProperty(value="contenu")
+	@JsonProperty(value="description")
 	private String description;
 	
-	public CompanyTwoOfferMapping(int id, String title, String description) {
+	public CompanyOneOfferMapping(int id, String title, String description) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.description = description;
 	}
 	
-	public CompanyTwoOfferMapping() {};
-			
+	public CompanyOneOfferMapping(){}
+
 	public int getId() {
 		return id;
 	}

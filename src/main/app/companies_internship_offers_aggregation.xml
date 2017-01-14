@@ -14,12 +14,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 		host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration" />
 	<apikit:config name="offer-config" raml="offer.raml"
 		consoleEnabled="false" doc:name="Router">
-		<apikit:flow-mapping resource="/search" action="get"
-			flow-ref="get:/search:offer-config" />
-		<apikit:flow-mapping resource="/alloffers" action="get"
-			flow-ref="get:/alloffers:offer-config" />
-		<apikit:flow-mapping resource="/singleoffer"
-			action="get" flow-ref="get:/singleoffer:offer-config" />
+        <apikit:flow-mapping resource="/search" action="get" flow-ref="get:/search:offer-config"/>
+        <apikit:flow-mapping resource="/alloffers" action="get" flow-ref="get:/alloffers:offer-config"/>
+        <apikit:flow-mapping resource="/singleoffer" action="get" flow-ref="get:/singleoffer:offer-config"/>
+        <apikit:flow-mapping resource="/sendmessage" action="get" flow-ref="get:/messages:offer-config"/>
 	</apikit:config>
 	<!-- Configuration used to query company one WS -->
 	<http:request-config name="HTTP_Request_Company1_Config"
@@ -35,7 +33,6 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 		<spring:bean id="MyJsonMApper" name="NonNullMapper"
 			class="fr.insaship.util.MyJsonMapper" />
 	</spring:beans>
-
 
 
 	<flow name="offer-main">
@@ -78,10 +75,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 					</when>
 					<otherwise>
 						<json:json-to-object-transformer
-							returnClass="fr.insaship.collection.CompanyOneOfferMapping[]"
+							returnClass="fr.insaship.collection.company1.CompanyOneOfferMapping[]"
 							mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object" />
 						<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
-							class="fr.insaship.collection.CompanyOneOffersTranformer"
+							class="fr.insaship.collection.company1.CompanyOneOffersTranformer"
 							doc:name="Java CompanyOffers transformation" />
 						<logger level="INFO" doc:name="Logger" />
 					</otherwise>
@@ -107,10 +104,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 					</when>
 					<otherwise>
 						<json:json-to-object-transformer
-							returnClass="fr.insaship.collection.CompanyTwoOfferMapping[]"
+							returnClass="fr.insaship.collection.company2.CompanyTwoOfferMapping[]"
 							mimeType="application/json" doc:name="JSON Results to CompanyOfferMapping Object" />
 						<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
-							class="fr.insaship.collection.CompanyTwoOffersTranformer"
+							class="fr.insaship.collection.company2.CompanyTwoOffersTranformer"
 							doc:name="Java CompanyOffers transformation" />
 						<logger level="INFO" doc:name="Logger" />
 					</otherwise>
@@ -140,10 +137,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 				</http:request>
 
 				<json:json-to-object-transformer
-					returnClass="fr.insaship.collection.CompanyOneOfferMapping"
+					returnClass="fr.insaship.collection.company1.CompanyOneOfferMapping"
 					mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object" />
 				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
-					class="fr.insaship.collection.CompanyOneSingleOfferTranformer"
+					class="fr.insaship.collection.company1.CompanyOneSingleOfferTranformer"
 					doc:name="Java CompanyOffer transformation" />
 
 			</when>
@@ -158,10 +155,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 						values="200" />
 				</http:request>
 				<json:json-to-object-transformer
-					returnClass="fr.insaship.collection.CompanyTwoOfferMapping"
+					returnClass="fr.insaship.collection.company2.CompanyTwoOfferMapping"
 					mimeType="application/json" doc:name="JSON Results to CompanyTwoOfferMapping Object" />
 				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
-					class="fr.insaship.collection.CompanyTwoSingleOfferTranformer"
+					class="fr.insaship.collection.company2.CompanyTwoSingleOfferTranformer"
 					doc:name="Java CompanyOffer transformation" />
 				
 			</when>

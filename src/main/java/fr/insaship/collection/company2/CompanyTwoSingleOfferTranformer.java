@@ -1,11 +1,13 @@
-package fr.insaship.collection;
+package fr.insaship.collection.company2;
 
-import java.util.Arrays;
-import java.util.List;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
+
+import fr.insaship.collection.Company;
+import fr.insaship.collection.CompanyOffers;
+import fr.insaship.collection.FinalOfferMapping;
 
 /**
  * Construction of an object combining the company Two infos and its offers. 
@@ -18,7 +20,7 @@ public class CompanyTwoSingleOfferTranformer extends AbstractMessageTransformer 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		
-		Offer offer =  (Offer) message.getPayload();
+		FinalOfferMapping offer =  (FinalOfferMapping) message.getPayload();
 		
 		String companyID = muleContext.getRegistry().get("company2.id");
 		String companyName = muleContext.getRegistry().get("company2.name");
@@ -26,7 +28,9 @@ public class CompanyTwoSingleOfferTranformer extends AbstractMessageTransformer 
 	
 		Company companyTwo= new Company(Integer.parseInt(companyID), companyName, companyLogoUrl);
 		
-		CompanyOffers result = new CompanyOffers(companyTwo, Arrays.asList(offer));
+		FinalOfferMapping mappedOffer = new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription());
+
+		CompanyOffers result = new CompanyOffers(companyTwo, mappedOffer);
 		
 		return result;
 	}

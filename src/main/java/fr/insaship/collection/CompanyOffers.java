@@ -1,7 +1,7 @@
 package fr.insaship.collection;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Class used to combine company information and offers retrieved from Company WS.
@@ -16,15 +16,21 @@ public class  CompanyOffers implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Company company;
-	private List<Offer> offerList;
+	private ArrayList<FinalOfferMapping> offerList;
 	
 	public CompanyOffers() {}
 	
-	public CompanyOffers(Company company, List<Offer> offerList) {
+	public CompanyOffers(Company company, ArrayList<FinalOfferMapping> offerList) {
 		this.company = company;
 		this.offerList = offerList;
 	}
 	
+	public CompanyOffers(Company company, FinalOfferMapping offer) {
+		this.company = company;
+		this.offerList = new ArrayList<FinalOfferMapping>();
+		this.offerList.add(offer);
+	}
+
 	public Company getCompany() {
 		return company;
 	}
@@ -33,11 +39,11 @@ public class  CompanyOffers implements Serializable {
 		this.company = company;
 	}
 
-	public List<Offer> getOfferList() {
+	public ArrayList<FinalOfferMapping> getOfferList() {
 		return offerList;
 	}
 
-	public void setOfferList(List<Offer> offerList) {
+	public void setOfferList(ArrayList<FinalOfferMapping> offerList) {
 		this.offerList = offerList;
 	}
 	

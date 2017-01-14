@@ -113,3 +113,18 @@ baseUri: http://localhost:8081/api/{version}
       200:
         body:
           application/json:
+/sendmessage:
+  displayName: InsaShip send message service
+  get:
+    description: Send a mail message for a given email and message
+    queryParameters:
+      email:
+        type: string
+        required: true
+      type:
+        type: integer
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
