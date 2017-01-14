@@ -20,7 +20,7 @@ public class CompanyTwoSingleOfferTranformer extends AbstractMessageTransformer 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		
-		FinalOfferMapping offer =  (FinalOfferMapping) message.getPayload();
+		CompanyTwoOfferMapping offer =  (CompanyTwoOfferMapping) message.getPayload();
 		
 		String companyID = muleContext.getRegistry().get("company2.id");
 		String companyName = muleContext.getRegistry().get("company2.name");
