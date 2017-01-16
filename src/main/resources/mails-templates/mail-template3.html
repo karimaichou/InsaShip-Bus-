@@ -4,9 +4,22 @@
 	<meta charset="UTF-8">
 	<title>Title</title>
 </head>
-	<body style="background-color:#E6E6FA">
-	<h3>Hello (#[message.inboundProperties.'http.query.params'.email])</h3>
-	Mail template 3.	
-	Paramètre Type = #[message.inboundProperties.'http.query.params'.type]
+	<body>
+	<h2>InsaShip</h2>
+	<table style="width: 100%; background-color: #c2deff; border-color: #5E5E5E;">
+	<tbody>
+	<tr><th>
+	<h3 style="text-align: left;">Mail template 3</h3>
+	<hr/></th></tr>
+	<tr>
+	<td>
+	<p>Message text : Hello #[message.inboundProperties.'http.query.params'.email]</p>
+	<br>	
+	<br>Parameter Type = #[message.inboundProperties.'http.query.params'.type]
+	</td>
+	</tr>
+	</tbody>
+	</table>
+	<p>Message signature</p>
 	</body>
 </html>

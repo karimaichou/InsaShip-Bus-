@@ -18,6 +18,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         <apikit:flow-mapping resource="/alloffers" action="get" flow-ref="get:/alloffers:offer-config"/>
         <apikit:flow-mapping resource="/singleoffer" action="get" flow-ref="get:/singleoffer:offer-config"/>
         <apikit:flow-mapping resource="/sendmessage" action="get" flow-ref="get:/messages:offer-config"/>
+        <apikit:flow-mapping resource="/companyoffers" action="get" flow-ref="get:/getcompanyoffers:offer-config"/>
 	</apikit:config>
 	<!-- Configuration used to query company one WS -->
 	<http:request-config name="HTTP_Request_Company1_Config"
@@ -33,8 +34,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 		<spring:bean id="MyJsonMApper" name="NonNullMapper"
 			class="fr.insaship.util.MyJsonMapper" />
 	</spring:beans>
-
-
+    
 	<flow name="offer-main">
 		<http:listener config-ref="offer-httpListenerConfig"
 			path="/api/*" doc:name="HTTP" />
@@ -57,62 +57,8 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	<!-- Search for offers in all companies -->
 	<flow name="get:/search:offer-config">
 		<scatter-gather doc:name="Scatter-Gather">
-			<processor-chain>
-
-				<http:request config-ref="HTTP_Request_Company1_Config"
-					path="/search/offers" method="GET" doc:name="Company 1 REST API - search offers">
-					<http:request-builder>
-						<http:query-param paramName="keyword"
-							value="#[message.inboundProperties.'http.query.params'.keyword]" />
-					</http:request-builder>
-					<http:success-status-code-validator
-						values="200,404" />
-
-				</http:request>
-				<choice doc:name="Choice">
-					<when expression="#[message.inboundProperties['http.status'] == '404']">
-						<set-payload value="#[null]" doc:name="Set Payload" />
-					</when>
-					<otherwise>
-						<json:json-to-object-transformer
-							returnClass="fr.insaship.collection.company1.CompanyOneOfferMapping[]"
-							mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object" />
-						<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
-							class="fr.insaship.collection.company1.CompanyOneOffersTranformer"
-							doc:name="Java CompanyOffers transformation" />
-						<logger level="INFO" doc:name="Logger" />
-					</otherwise>
-				</choice>
-			</processor-chain>
-			<processor-chain>
-
-				<http:request config-ref="HTTP_Request_Company2_Config"
-					path="/recherche/offre" method="GET" doc:name="Company 2 REST API - search offers">
-					<http:request-builder>
-						<http:query-param paramName="key"
-							value="#[message.inboundProperties.'http.query.params'.keyword]" />
-					</http:request-builder>
-					<!-- Do not throw exception on 404 (no results from api) to continue 
-						flow and map with null payload -->
-					<http:success-status-code-validator
-						values="200,404" />
-
-				</http:request>
-				<choice doc:name="Choice">
-					<when expression="#[message.inboundProperties['http.status'] == '404']">
-						<set-payload value="#[null]" doc:name="Set Payload to null" />
-					</when>
-					<otherwise>
-						<json:json-to-object-transformer
-							returnClass="fr.insaship.collection.company2.CompanyTwoOfferMapping[]"
-							mimeType="application/json" doc:name="JSON Results to CompanyOfferMapping Object" />
-						<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
-							class="fr.insaship.collection.company2.CompanyTwoOffersTranformer"
-							doc:name="Java CompanyOffers transformation" />
-						<logger level="INFO" doc:name="Logger" />
-					</otherwise>
-				</choice>
-			</processor-chain>
+            <flow-ref name="company1-search-subflow" doc:name="search offers from company 1"/>
+            <flow-ref name="company2-search-subflow" doc:name="search offers from company 1"/>
 		</scatter-gather>
 		<json:object-to-json-transformer
 			doc:name="Object to JSON" mimeType="application/json" mapper-ref="NonNullMapper"
@@ -142,7 +88,6 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
 					class="fr.insaship.collection.company1.CompanyOneSingleOfferTranformer"
 					doc:name="Java CompanyOffer transformation" />
-
 			</when>
 			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '2']">
 				<http:request config-ref="HTTP_Request_Company2_Config"
@@ -160,7 +105,6 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
 					class="fr.insaship.collection.company2.CompanyTwoSingleOfferTranformer"
 					doc:name="Java CompanyOffer transformation" />
-				
 			</when>
 			<otherwise>
 				<set-payload value="#[null]" doc:name="Set Payload to null" />
@@ -173,6 +117,81 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 		<logger level="INFO" doc:name="Logger" />
 	</flow>
 
+	<!-- Search for offers in all companies -->
+	<flow name="get:/getcompanyoffers:offer-config">
+		<choice doc:name="Choice">
+			<!-- if company One -->
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '1' &amp;&amp; message.inboundProperties.'http.query.params'.size() == 1]">
+                <flow-ref name="company1-search-subflow" doc:name="company1-search-subflow"/>
+			</when>
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '2'  &amp;&amp; message.inboundProperties.'http.query.params'.size() == 1]">
+				<flow-ref name="company2-search-subflow" doc:name="Get all offers from company 2"/>
+			</when>
+			<otherwise>
+				<set-payload value="#[null]" doc:name="Set Payload to null" />
+				<logger level="INFO" doc:name="Logger" />
+			</otherwise>
+		</choice>
+		<json:object-to-json-transformer
+			doc:name="Object to JSON" mimeType="application/json" mapper-ref="NonNullMapper"
+			ignoreBadInput="true" />
+		<logger level="INFO" doc:name="Logger" />
+	</flow>
+	
+	<!-- Sub flow used to search offers in company1 (if no keyword is given, get all offers)  -->
+	<sub-flow name="company1-search-subflow">
+       	<http:request config-ref="HTTP_Request_Company1_Config"
+				path="/search/offers" method="GET" doc:name="Company 1 REST API - search offers">
+				<http:request-builder>
+                       <http:query-param paramName="keyword" value="#[message.inboundProperties.'http.query.params'.keyword]"/>
+				</http:request-builder>
+				<http:success-status-code-validator
+					values="200,404" />
+		</http:request>
+		<choice doc:name="Choice">
+			<when expression="#[message.inboundProperties['http.status'] == '404']">
+				<set-payload value="#[null]" doc:name="Set Payload" />
+			</when>
+			<otherwise>
+				<json:json-to-object-transformer
+					returnClass="fr.insaship.collection.company1.CompanyOneOfferMapping[]"
+					mimeType="application/json" doc:name="JSON Results to CompanyOneOfferMapping Object" />
+				<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
+					class="fr.insaship.collection.company1.CompanyOneOffersTranformer"
+					doc:name="Java CompanyOffers transformation" />
+				<logger level="INFO" doc:name="Logger" />
+			</otherwise>
+		</choice>
+	 </sub-flow>
+
+	<!-- Sub flow used to search offers in company2 (if no keyword is given, get all offers)  -->
+	<sub-flow name="company2-search-subflow">
+		<http:request config-ref="HTTP_Request_Company2_Config"
+					path="/recherche/offre" method="GET" doc:name="Company 2 REST API - search offers">
+				<http:request-builder>
+					<http:query-param paramName="key"
+						value="#[message.inboundProperties.'http.query.params'.keyword]" />
+				</http:request-builder>
+				<!-- Do not throw exception on 404 (no results from api) to continue 
+					flow and map with null payload -->
+				<http:success-status-code-validator
+					values="200,404" />
+			</http:request>
+			<choice doc:name="Choice">
+				<when expression="#[message.inboundProperties['http.status'] == '404']">
+					<set-payload value="#[null]" doc:name="Set Payload to null" />
+				</when>
+				<otherwise>
+					<json:json-to-object-transformer
+						returnClass="fr.insaship.collection.company2.CompanyTwoOfferMapping[]"
+						mimeType="application/json" doc:name="JSON Results to CompanyOfferMapping Object" />
+					<custom-transformer returnClass="fr.insaship.collection.CompanyOffers"
+						class="fr.insaship.collection.company2.CompanyTwoOffersTranformer"
+						doc:name="Java CompanyOffers transformation" />
+					<logger level="INFO" doc:name="Logger" />
+				</otherwise>
+			</choice>
+	</sub-flow>
 
 	<!-- API Global exceptions handling -->
 	<apikit:mapping-exception-strategy
