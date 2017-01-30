@@ -11,7 +11,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 	<http:listener-config name="offer-httpListenerConfig"
-		host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration" />
+		host="0.0.0.0" port="8181" doc:name="HTTP Listener Configuration" />
 	<apikit:config name="offer-config" raml="offer.raml"
 		consoleEnabled="false" doc:name="Router">
         <apikit:flow-mapping resource="/search" action="get" flow-ref="get:/search:offer-config"/>
@@ -70,7 +70,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	<flow name="get:/singleoffer:offer-config">
 		<choice doc:name="Choice">
 			<!-- if company One -->
-			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '1']">
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '${company1.id}']">
 
 				<http:request config-ref="HTTP_Request_Company1_Config"
 					path="/offer" method="GET" doc:name="Company 1 REST API - get one offer">
@@ -89,7 +89,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 					class="fr.insaship.collection.company1.CompanyOneSingleOfferTranformer"
 					doc:name="Java CompanyOffer transformation" />
 			</when>
-			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '2']">
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '${company2.id}']">
 				<http:request config-ref="HTTP_Request_Company2_Config"
 					path="/offre" method="GET" doc:name="Company 2 REST API - get one offer">
 					<http:request-builder>
@@ -121,10 +121,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	<flow name="get:/getcompanyoffers:offer-config">
 		<choice doc:name="Choice">
 			<!-- if company One -->
-			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '1' &amp;&amp; message.inboundProperties.'http.query.params'.size() == 1]">
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '${company1.id}' &amp;&amp; message.inboundProperties.'http.query.params'.size() == 1]">
                 <flow-ref name="company1-search-subflow" doc:name="company1-search-subflow"/>
 			</when>
-			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '2'  &amp;&amp; message.inboundProperties.'http.query.params'.size() == 1]">
+			<when expression="#[message.inboundProperties.'http.query.params'.cpnId == '${company2.id}'  &amp;&amp; message.inboundProperties.'http.query.params'.size() == 1]">
 				<flow-ref name="company2-search-subflow" doc:name="Get all offers from company 2"/>
 			</when>
 			<otherwise>

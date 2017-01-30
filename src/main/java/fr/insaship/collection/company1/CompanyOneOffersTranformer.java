@@ -32,7 +32,7 @@ public class CompanyOneOffersTranformer extends AbstractMessageTransformer {
 		
 		// Build final offer List
 		for(CompanyOneOfferMapping offer : offers) {
-			mappedOffers.add(new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription()));
+			mappedOffers.add(new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription(), offer.getStartdate()));
 		}
 		
 		CompanyOffers result = new CompanyOffers(companyOne, mappedOffers);

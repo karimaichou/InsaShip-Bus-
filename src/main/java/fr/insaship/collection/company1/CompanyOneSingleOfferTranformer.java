@@ -27,7 +27,7 @@ public class CompanyOneSingleOfferTranformer extends AbstractMessageTransformer 
 	
 		Company companyOne = new Company(Integer.parseInt(companyID), companyName, companyLogoUrl);
 		
-		FinalOfferMapping mappedOffer = new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription());
+		FinalOfferMapping mappedOffer = new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription(), offer.getStartdate());
 
 		CompanyOffers result = new CompanyOffers(companyOne, mappedOffer);
 		

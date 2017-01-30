@@ -1,6 +1,9 @@
 package fr.insaship.collection.company2;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -30,9 +33,11 @@ public class CompanyTwoOffersTranformer extends AbstractMessageTransformer {
 	
 		Company companyTwo= new Company(Integer.parseInt(companyID), companyName, companyLogoUrl);
 		
+		//String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
+		
 		// Build final offer List
 		for(CompanyTwoOfferMapping offer : offers) {
-			mappedOffers.add(new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription()));
+			mappedOffers.add(new FinalOfferMapping(offer.getId(), offer.getTitle(), offer.getDescription(), offer.getStartdate()));
 		}
 				
 		CompanyOffers result = new CompanyOffers(companyTwo, mappedOffers);

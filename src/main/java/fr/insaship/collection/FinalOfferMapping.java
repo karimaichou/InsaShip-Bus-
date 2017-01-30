@@ -17,11 +17,15 @@ public class FinalOfferMapping implements Serializable {
 	@JsonProperty(value="description")
 	private String description;
 	
-	public FinalOfferMapping(int id, String title, String description) {
+	@JsonProperty(value="startdate")
+	private String startdate;
+	
+	public FinalOfferMapping(int id, String title, String description, String startdate) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.description = description;
+		this.startdate = startdate;
 	}
 	
 	public FinalOfferMapping() {};
@@ -54,4 +58,11 @@ public class FinalOfferMapping implements Serializable {
 		
 	}
 
+	public String getStartdate() {
+		return startdate;
+	}
+
+	public void setStartdate(String startdate) {
+		this.startdate = startdate;
+	}
 }

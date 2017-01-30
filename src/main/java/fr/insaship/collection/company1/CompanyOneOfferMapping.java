@@ -24,11 +24,15 @@ public class CompanyOneOfferMapping implements Serializable {
 	@JsonProperty(value="description")
 	private String description;
 	
-	public CompanyOneOfferMapping(int id, String title, String description) {
+	@JsonProperty(value="startDate")
+	private String startdate;
+
+	public CompanyOneOfferMapping(int id, String title, String description, String startdate) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.description = description;
+		this.startdate = startdate;
 	}
 	
 	public CompanyOneOfferMapping(){}
@@ -57,9 +61,17 @@ public class CompanyOneOfferMapping implements Serializable {
 		this.description = description;
 	}
 	
+	public String getStartdate() {
+		return startdate;
+	}
+
+	public void setStartdate(String startdate) {
+		this.startdate = startdate;
+	}
+	
 	@Override
 	public String toString() {
-		return "Offer [id = " + id + ", title = " + title + ", description = " + description + "]";	
+		return "Offer [id = " + id + ", title = " + title + ", description = " + description + ", startdate = " + startdate + "]";	
 	}
 	
 }
